@@ -40,16 +40,19 @@ public class Move : MonoBehaviour {
     string vAxis;
     string jumpBtn;
     string dashBtn;
-    
+
 
     //box collider info
-    float center_y; // center of 
+    float center_y; // center of
     float size_y; // height of box collider in y axis
     float size_z; // z axis width
     Vector3 top_start;
     Vector3 hang_start;
     Vector3 bottom_start;
-
+    Vector3 ahead_start;
+    Vector3 behind_start;
+    float bottom;
+    float half_width;
 
 
     // Use this for initialization
@@ -75,97 +78,26 @@ public class Move : MonoBehaviour {
         size_z = boxCollider.size.z;
         size_y = boxCollider.size.y;
         center_y = boxCollider.center.y;
+        bottom = center_y - (size_y / 2f);
+        half_width = size_z / 2f;
 
         top_start = new Vector3(0, center_y + size_y / 2, 0);
         hang_start = top_start + new Vector3(0, -.85f, 0);
         bottom_start = new Vector3(0, center_y - size_y / 4, 0);
 
-    }
-	
-    bool isGrounded()
-    {
-        float bottom = center_y - (size_y / 2f);
-        float half_width = size_z / 2f;
+        ahead_start = new Vector3(0f, bottom + 0.1f, half_width - 0.1f);
+        behind_start = new Vector3(0f, bottom + 0.1f, -half_width + 0.1f);
 
-        bool ahead = Physics.Raycast(transform.position + new Vector3(0f, bottom + 0.1f, half_width - 0.1f), Vector3.down, jump_range);
-        bool behind = Physics.Raycast(transform.position + new Vector3(0f, bottom + 0.1f, -half_width + 0.1f), Vector3.down, jump_range);
-
-        if (DEBUG)
-        {
-            Debug.DrawRay(transform.position + new Vector3(0f, bottom, half_width), Vector3.down * jump_range, Color.magenta);
-            Debug.DrawRay(transform.position + new Vector3(0f, bottom, -half_width), Vector3.down * jump_range, Color.magenta);
-        }
-
-        return (ahead || behind);
     }
 
-    bool isAgainstFrontTop()
-    {
-        if (DEBUG)
-        {
-            Debug.DrawRay(transform.position + top_start, Vector3.forward * against_range, Color.green);
-        }
+    // return true if the ray cast hits, show a debug line if DEBUG is true
+    bool isAgainst(Vector3 position, Vector3 direction, float range, Color color) {
+      if (DEBUG)
+      {
+        Debug.DrawRay(transform.position + position, direction * range, color);
+      }
 
-        return Physics.Raycast(transform.position + top_start, Vector3.forward, against_range);
-    }
-
-
-    bool isAgainstFrontHang()
-    {
-        if (DEBUG)
-        {
-            Debug.DrawRay(transform.position + hang_start, Vector3.forward * against_range, Color.grey);
-        }
-
-        return Physics.Raycast(transform.position + hang_start, Vector3.forward, against_range);
-    }
-
-    bool isAgainstFrontBottom()
-    {
-        if (DEBUG)
-        {
-            Debug.DrawRay(transform.position + bottom_start, Vector3.forward * against_range, Color.green);
-        }
-            
-        return Physics.Raycast(transform.position + bottom_start, Vector3.forward, against_range);
-    }
-
-    bool isAgainstBack()
-    {
-        bool top = Physics.Raycast(transform.position + top_start, Vector3.back, against_range);
-        bool bottom = Physics.Raycast(transform.position + bottom_start, Vector3.back, against_range);
-
-        if (DEBUG)
-        {
-            Debug.DrawRay(transform.position + top_start, Vector3.back * against_range, Color.blue);
-            Debug.DrawRay(transform.position + bottom_start, Vector3.back * against_range, Color.blue);
-        }
-
-            
-        return (top || bottom);
-    }
-
-    bool isAgainstPlayer()
-    {
-        RaycastHit right;
-        RaycastHit left;
-        Physics.Raycast(transform.position + top_start, Vector3.forward, out right, against_range);
-        Physics.Raycast(transform.position + top_start, Vector3.back, out left, against_range);
-        if (DEBUG)
-        {
-            Debug.DrawRay(transform.position + top_start, Vector3.forward * against_range, Color.red);
-            Debug.DrawRay(transform.position + top_start, Vector3.back * against_range, Color.red);
-        }
-        
-
-        if (right.collider != null && right.collider.tag == "Player") {
-            return true;
-        }
-        if (left.collider != null && left.collider.tag == "Player")
-        {
-            return true;
-        }
-        return false;
+      return Physics.Raycast(transform.position + position, direction, range);
     }
 
     void Update()
@@ -175,17 +107,17 @@ public class Move : MonoBehaviour {
         bool jump_btn = Input.GetButtonDown(jumpBtn);
         bool dash_btn = Input.GetButtonDown(dashBtn);
 
-        bool grounded = isGrounded();
-        bool against_front_top = isAgainstFrontTop();
-        bool against_front_hang = isAgainstFrontHang();
-        bool against_front_bottom = isAgainstFrontBottom();
-        bool against_player = isAgainstPlayer();
+        bool grounded = (
+          isAgainst(ahead_start, Vector3.down, jump_range, Color.magenta) ||
+          isAgainst(behind_start, Vector3.down, jump_range, Color.magenta)
+        );
+        bool against_front_top = isAgainst(top_start, Vector3.forward, against_range, Color.green);
+        bool against_front_hang = isAgainst(hang_start, Vector3.forward, against_range, Color.grey);
+        bool against_front_bottom = isAgainst(bottom_start, Vector3.forward, against_range, Color.green);
 
         Vector3 deltaRun = new Vector3(0, 0, rb.velocity.z);
         Vector3 deltaJump = new Vector3(0, rb.velocity.y, 0);
         Vector3 deltaDash = Vector3.zero;
-        
-
 
 
         // DASHING
