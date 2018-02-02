@@ -11,7 +11,7 @@ public class Move : MonoBehaviour {
 
     [Range(0f, 3f)]
     public float dash_time = 1;
-    [Range(0f, 50f)]
+    [Range(0f, 500f)]
     public float dash_vel = 20;
 
     [Range(0f, 50f)]
@@ -38,6 +38,7 @@ public class Move : MonoBehaviour {
     bool jump_request;
     bool hanging;
     bool dashing;
+    bool dash_request;
     // keeps remaining time of dash
     float dash_ctr;
 
@@ -71,7 +72,7 @@ public class Move : MonoBehaviour {
         boxCollider = GetComponent<BoxCollider>();
 
         // initial settings double check
-        trailRenderer.time = 0;
+        trailRenderer.time = 1;
         trailRenderer.enabled = false;
 
         //controls
@@ -126,6 +127,7 @@ public class Move : MonoBehaviour {
         if (dash_btn && !dashing && dash_ctr <= 0) {
           dash_ctr = dash_time;
           dashing = true;
+          dash_request = true;
           trailRenderer.enabled = true;
         }
 
@@ -135,7 +137,7 @@ public class Move : MonoBehaviour {
           // If out of time, turn Dash off
           if (dash_ctr <= 0) {
             dashing = false;
-            trailRenderer.enabled = false;
+            // trailRenderer.enabled = false;
           }
         }
 
@@ -174,6 +176,11 @@ public class Move : MonoBehaviour {
         float hMov = Input.GetAxis(hAxis);
         float vMov = Input.GetAxis(vAxis);
 
+        if (DEBUG)
+        {
+          Debug.DrawRay(transform.position + (Vector3.up * size_y / 2), new Vector3(0f, vMov, hMov) * 3, Color.red);
+        }
+
         // RUN
         if (hMov != 0) {
           // which direction to apply running in
@@ -192,30 +199,34 @@ public class Move : MonoBehaviour {
         }
 
         // DASH
-        if (dashing) {
-          int sign = hMov > 0 ? 1 : -1;
+        if (dash_request) {
+          dash_request = false;
           // calculate required dash velocity
-          float delta_dash_vel = dash_vel * sign - rb.velocity.z;
+          // float delta_dash_vel = dash_vel * sign - rb.velocity.z;
           // apply dash speed
-          rb.velocity += Vector3.forward * delta_dash_vel;
+          Debug.Log("DASH IT HOMIE");
+          // rb.velocity += Vector3.forward * delta_dash_vel;
           // rb.velocity += Vector3.Normalize(rb.velocity) * delta_dash_vel;
-          // rb.velocity += Vector3.Normalize(new Vector3(0f, vMov, hMov)) * delta_dash_vel;
+          //rb.AddForce(0f, vMov * dash_vel, hMov * dash_vel, ForceMode.Impulse);
+          rb.velocity += Vector3.Normalize(new Vector3(0f, vMov, hMov)) * dash_vel;
+          Debug.Log(vMov);
+          Debug.Log(hMov);
         }
 
         // JUMP
-        if (jump_request) {
-          jumping = true;
-          rb.velocity += Vector3.up * jump_velocity;
-          jump_request = false;
-        }
+        // if (jump_request) {
+        //   jumping = true;
+        //   rb.velocity += Vector3.up * jump_velocity;
+        //   jump_request = false;
+        // }
 
 
-        if (hanging) {
-          rb.useGravity = false;
-          rb.velocity = Vector3.zero;
-        } else {
-          rb.useGravity = true;
-        }
+        // if (hanging) {
+        //   rb.useGravity = false;
+        //   rb.velocity = Vector3.zero;
+        // } else {
+        //   rb.useGravity = true;
+        // }
 
         // FALL
         if (rb.velocity.y < 0) {
