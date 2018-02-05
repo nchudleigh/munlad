@@ -283,7 +283,7 @@ MonoBehaviour:
   cube: {fileID: 1809710610146654, guid: 882d2e5c3c654df49b2f9c7a2e3716d2, type: 2}
   score_display: {fileID: 0}
   start_display: {fileID: 0}
-  spawn_cubes: 0
+  spawn_cubes: 1
 --- !u!4 &310081399
 Transform:
   m_ObjectHideFlags: 0
@@ -724,6 +724,76 @@ Prefab:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3681543e5b0f59742b73073cb379cdc6, type: 2}
+  m_IsPrefabParent: 0
+--- !u!1001 &1665103372
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4764931662944914, guid: fd6f06571399cab47826c3829de5a651, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764931662944914, guid: fd6f06571399cab47826c3829de5a651, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764931662944914, guid: fd6f06571399cab47826c3829de5a651, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: -0.23
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764931662944914, guid: fd6f06571399cab47826c3829de5a651, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764931662944914, guid: fd6f06571399cab47826c3829de5a651, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764931662944914, guid: fd6f06571399cab47826c3829de5a651, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764931662944914, guid: fd6f06571399cab47826c3829de5a651, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764931662944914, guid: fd6f06571399cab47826c3829de5a651, type: 2}
+      propertyPath: m_RootOrder
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4422508098499352, guid: fd6f06571399cab47826c3829de5a651, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: -0.61
+      objectReference: {fileID: 0}
+    - target: {fileID: 65883170083228430, guid: fd6f06571399cab47826c3829de5a651,
+        type: 2}
+      propertyPath: m_Size.z
+      value: 2.336906
+      objectReference: {fileID: 0}
+    - target: {fileID: 65883170083228430, guid: fd6f06571399cab47826c3829de5a651,
+        type: 2}
+      propertyPath: m_Center.z
+      value: 0.16845298
+      objectReference: {fileID: 0}
+    - target: {fileID: 114883899221551764, guid: fd6f06571399cab47826c3829de5a651,
+        type: 2}
+      propertyPath: dash_vel
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1825020460526456, guid: fd6f06571399cab47826c3829de5a651, type: 2}
+      propertyPath: m_Name
+      value: Player (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 114883899221551764, guid: fd6f06571399cab47826c3829de5a651,
+        type: 2}
+      propertyPath: joy_num
+      value: 2
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: fd6f06571399cab47826c3829de5a651, type: 2}
   m_IsPrefabParent: 0
 --- !u!1 &1989596683
 GameObject:

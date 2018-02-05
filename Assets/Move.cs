@@ -6,7 +6,7 @@ public class Move : MonoBehaviour {
 
     public int joy_num;
 
-    [Range(0f, 50f)]
+    [Range(0f, 1f)]
     public float speed = 10;
 
     [Range(0f, 3f)]
@@ -28,7 +28,7 @@ public class Move : MonoBehaviour {
 
     public bool DEBUG = true;
 
-    Rigidbody rb;
+    CharacterController ct;
     Animator animator;
     BoxCollider boxCollider;
     TrailRenderer trailRenderer;
@@ -66,10 +66,9 @@ public class Move : MonoBehaviour {
     void Start () {
         Debug.Log(string.Format("Player {0} joined", joy_num));
         //Game Objects
-        rb = GetComponent<Rigidbody>();
+        ct = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
         trailRenderer = GetComponentInChildren<TrailRenderer>();
-        boxCollider = GetComponent<BoxCollider>();
 
         // initial settings double check
         trailRenderer.time = 1;
@@ -82,9 +81,10 @@ public class Move : MonoBehaviour {
         dashBtn = string.Format("Dash_P{0}", joy_num);
 
         //constants
-        size_z = boxCollider.size.z;
-        size_y = boxCollider.size.y;
-        center_y = boxCollider.center.y;
+        
+        size_z = ct.radius;
+        size_y = ct.height;
+        center_y = ct.center.y;
         bottom = center_y - (size_y / 2f);
         half_width = size_z / 2f;
         // starting positions for Raycasts
@@ -165,8 +165,8 @@ public class Move : MonoBehaviour {
         }
 
         // update animator parameters
-        animator.SetFloat("ZVEL", rb.velocity.z / speed, .1f, Time.deltaTime);
-        animator.SetFloat("YVEL", rb.velocity.y);
+        // animator.SetFloat("ZVEL", rb.velocity.z / speed, .1f, Time.deltaTime);
+        // animator.SetFloat("YVEL", rb.velocity.y);
     }
 
 
@@ -176,6 +176,7 @@ public class Move : MonoBehaviour {
         float hMov = Input.GetAxis(hAxis);
         float vMov = Input.GetAxis(vAxis);
 
+        // Show the joystick direction
         if (DEBUG)
         {
           Debug.DrawRay(transform.position + (Vector3.up * size_y / 2), new Vector3(0f, vMov, hMov) * 3, Color.red);
@@ -185,20 +186,15 @@ public class Move : MonoBehaviour {
         if (hMov != 0) {
           // which direction to apply running in
           int sign = hMov > 0 ? 1 : -1;
-          // calculate required run speed
-          float delta_run_vel = speed * sign - rb.velocity.z;
           // apply run speed
-          rb.velocity += Vector3.forward * delta_run_vel;
+          ct.Move(Vector3.forward * speed * sign);
           // rotate player to correct direction
           Quaternion rotation_target = Quaternion.Euler(0, sign==1?0:180, 0);
-          transform.rotation = Quaternion.Slerp(transform.rotation, rotation_target, Time.deltaTime * speed);
-        }
-        // If there is no input make sure he comes to a complete stop
-        else if (Mathf.Abs(rb.velocity.z) < 0.05f) {
-          rb.velocity = new Vector3(0f, rb.velocity.y, 0f);
+          transform.rotation = Quaternion.Slerp(transform.rotation, rotation_target, Time.deltaTime * 10);
         }
 
         // DASH
+        /*
         if (dash_request) {
           dash_request = false;
           // calculate required dash velocity
@@ -209,9 +205,8 @@ public class Move : MonoBehaviour {
           // rb.velocity += Vector3.Normalize(rb.velocity) * delta_dash_vel;
           //rb.AddForce(0f, vMov * dash_vel, hMov * dash_vel, ForceMode.Impulse);
           rb.velocity += Vector3.Normalize(new Vector3(0f, vMov, hMov)) * dash_vel;
-          Debug.Log(vMov);
-          Debug.Log(hMov);
         }
+        */
 
         // JUMP
         // if (jump_request) {
@@ -229,10 +224,11 @@ public class Move : MonoBehaviour {
         // }
 
         // FALL
+        /*
         if (rb.velocity.y < 0) {
             // increase fall speed by gravitational pull * fall_multiplier
             rb.velocity += Vector3.up * Physics.gravity.y * fall_multiplier * Time.deltaTime;
         }
-
+        */
     }
 }
