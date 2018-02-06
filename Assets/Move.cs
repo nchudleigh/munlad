@@ -11,20 +11,11 @@ public class Move : MonoBehaviour {
 
     [Range(0f, 3f)]
     public float dash_time = 1;
-    [Range(0f, 500f)]
-    public float dash_vel = 20;
-
-    [Range(0f, 50f)]
-    public float jump_velocity = 10;
+    [Range(0f, 1f)]
+    public float dash_vel = 1;
 
     [Range(0f, 10f)]
     public float against_range = 1.5f;
-
-    [Range(0f, 2f)]
-    public float jump_range = 0.5f;
-
-    [Range(0f, 5f)]
-    public float fall_multiplier = 1f;
 
     public bool DEBUG = true;
 
@@ -112,15 +103,6 @@ public class Move : MonoBehaviour {
         bool jump_btn = Input.GetButtonDown(jumpBtn);
         bool dash_btn = Input.GetButtonDown(dashBtn);
 
-        bool grounded = (
-          isAgainst(ahead_start, Vector3.down, jump_range, Color.magenta) ||
-          isAgainst(behind_start, Vector3.down, jump_range, Color.magenta)
-        );
-        bool against_front_top = isAgainst(top_start, Vector3.forward, against_range, Color.green);
-        bool against_front_hang = isAgainst(hang_start, Vector3.forward, against_range, Color.grey);
-        bool against_front_bottom = isAgainst(bottom_start, Vector3.forward, against_range, Color.green);
-
-
         // DASH
 
         // Turn Dash On
@@ -142,16 +124,17 @@ public class Move : MonoBehaviour {
         }
 
         // JUMP
-        if (jump_btn && (grounded || hanging)) {
+        if (jump_btn && ct.isGrounded) {
           jump_request = true;
           animator.SetBool("JUMP", true);
         }
 
-        if (grounded && jumping) {
+        if (ct.isGrounded && jumping) {
           jumping = false;
           animator.SetBool("JUMP", false);
         }
 
+        /*
         // LEDGE HANG
         if (!grounded && !against_front_top && against_front_hang && !jump_btn)
         {
@@ -163,10 +146,10 @@ public class Move : MonoBehaviour {
             animator.SetBool("HANG", false);
             hanging = false;
         }
-
+        */
         // update animator parameters
-        // animator.SetFloat("ZVEL", rb.velocity.z / speed, .1f, Time.deltaTime);
-        // animator.SetFloat("YVEL", rb.velocity.y);
+        Debug.Log(ct.velocity.z);
+        Debug.Log(ct.velocity.y);
     }
 
 
@@ -182,39 +165,34 @@ public class Move : MonoBehaviour {
           Debug.DrawRay(transform.position + (Vector3.up * size_y / 2), new Vector3(0f, vMov, hMov) * 3, Color.red);
         }
 
-        // RUN
-        if (hMov != 0) {
-          // which direction to apply running in
-          int sign = hMov > 0 ? 1 : -1;
-          // apply run speed
-          ct.Move(Vector3.forward * speed * sign);
-          // rotate player to correct direction
-          Quaternion rotation_target = Quaternion.Euler(0, sign==1?0:180, 0);
-          transform.rotation = Quaternion.Slerp(transform.rotation, rotation_target, Time.deltaTime * 10);
-        }
+        // apply run speed
+        ct.Move(Vector3.forward * speed * hMov);
+        // rotate player to correct direction
+        Quaternion rotation_target = Quaternion.Euler(0, hMov>0?0:180, 0);
+        transform.rotation = Quaternion.Slerp(transform.rotation, rotation_target, Time.deltaTime * 10);
+
+        animator.SetFloat("ZVEL", ct.velocity.z, .1f, Time.deltaTime);
+        animator.SetFloat("YVEL", ct.velocity.y);
 
         // DASH
-        /*
-        if (dash_request) {
-          dash_request = false;
+        if (dashing) {
           // calculate required dash velocity
           // float delta_dash_vel = dash_vel * sign - rb.velocity.z;
           // apply dash speed
-          Debug.Log("DASH IT HOMIE");
           // rb.velocity += Vector3.forward * delta_dash_vel;
           // rb.velocity += Vector3.Normalize(rb.velocity) * delta_dash_vel;
           //rb.AddForce(0f, vMov * dash_vel, hMov * dash_vel, ForceMode.Impulse);
-          rb.velocity += Vector3.Normalize(new Vector3(0f, vMov, hMov)) * dash_vel;
+          ct.Move(Vector3.Normalize(new Vector3(0f, vMov, hMov)) * dash_vel);
         }
-        */
 
         // JUMP
-        // if (jump_request) {
-        //   jumping = true;
-        //   rb.velocity += Vector3.up * jump_velocity;
-        //   jump_request = false;
-        // }
-
+        /*
+        if (jump_request) {
+            jumping = true;
+            ct.velocity += Vector3.up * jump_velocity;
+            jump_request = false;
+        }
+        */
 
         // if (hanging) {
         //   rb.useGravity = false;
